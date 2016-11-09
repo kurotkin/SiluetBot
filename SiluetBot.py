@@ -16,6 +16,8 @@ import functools
 import yaml
 import requests
 import urllib.request
+from PIL import Image
+from StringIO import StringIO
 
 im_sun = 'CAPTURE \xE2\x98\x80'
 
@@ -38,10 +40,8 @@ def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
 
 def getImg (url):
-    pic = requests.get(img)
-    out = open("...\img.jpg", "wb")
-    out.write(pic.content)
-    out.close()
+    r = requests.get(url)
+    pic = Image.open(StringIO(r.content))
     return pic
 
 def tempOut(bot, update):
@@ -58,8 +58,8 @@ def tempOut(bot, update):
     l = requests.get(l_url)
     update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
 
-    p = getImg(ur['S7_1200']['url_img'])
-    bot.sendPhoto(chat_id = chat_id, photo = p)
+    pic = getImg(ur['S7_1200']['url_img'])
+    bot.sendPhoto(chat_id = chat_id, photo = pic)
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
