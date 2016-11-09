@@ -50,6 +50,8 @@ def auth(bot, update):
             text = "Вы авторизованы.",
             reply_markup = reply_markup
         )
+        logger.info('Send message: {}'.format(update.message.chat_id))
+        update.message.reply_text("Ваш id" + update.message.chat_id)
     else:
         bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
 
@@ -78,7 +80,7 @@ def tempOut(bot, update):
 
     pic = getImg(ur['S7_1200']['url_img'])
     #bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
-    bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
+    #bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
