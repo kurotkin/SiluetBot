@@ -35,6 +35,24 @@ logger = logging.getLogger(__name__)
 def start(bot, update):
     update.message.reply_text("Привет, дорогой друг!\n Для получения информации набери /info")
 
+def auth(bot, update):
+    if config['telegtam']['password'] in update.message.text:
+        if update.message.chat_id not in config['telegtam']['authenticated_users']:
+            config['telegtam']['authenticated_users'].append(update.message.chat_id)
+        custom_keyboard = [
+            ['/Включить_обогреватели', '/Выключить_обогреватели'],
+            ['/Включить_прожектор', '/Выключить_прожектор'],
+            ['/Улица', '/Комната']
+        ]
+        reply_markup = ReplyKeyboardMarkup(custom_keyboard)
+        bot.sendMessage(
+            chat_id = update.message.chat_id,
+            text = "Вы авторизованы.",
+            reply_markup = reply_markup
+        )
+    else:
+        bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
+
 def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
 
@@ -71,24 +89,6 @@ def echo(bot, update):
     #update.message.reply_text(update.message.text)
     update.message.reply_text("Для получения информации набери /info <- или нажми\n" + \
                                 "Для авторизации отправь /auth password.")
-
-def auth(bot, update):
-    if config['telegtam']['password'] in update.message.text:
-        if update.message.chat_id not in config['telegtam']['authenticated_users']:
-            config['telegtam']['authenticated_users'].append(update.message.chat_id)
-        custom_keyboard = [
-            ['Включить_обогреватели', 'Выключить_обогреватели'],
-            ['Включить_прожектор', 'Выключить_прожектор'],
-            ['Улица', 'Комната']
-        ]
-        reply_markup = ReplyKeyboardMarkup(custom_keyboard)
-        bot.sendMessage(
-            chat_id = update.message.chat_id,
-            text = "Вы авторизованы.",
-            reply_markup = reply_markup
-        )
-    else:
-        bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
