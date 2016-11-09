@@ -1,6 +1,7 @@
 # S7-1200 config
 S7_1200:
   url: 'http://192.168.1.50/awp/'
+  url_img: 'http://192.168.1.50/cpu/CPU1200/intro_cpu.jpg'
   Out:
     Temp: 'IO/IOtempOut.htm'
     Dump: 'IO/IOdumpOut.htm'

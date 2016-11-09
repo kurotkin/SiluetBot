@@ -18,6 +18,7 @@ import requests
 import urllib.request
 
 im_sun = 'CAPTURE \xE2\x98\x80'
+
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
 ur = yaml.load(open('conf_s7-1200.yaml'))
@@ -48,15 +49,19 @@ def tempOut(bot, update):
     # Яркость
     l_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Light']
     l = requests.get(l_url)
-    update.message.reply_text("Солнышко светит на  " + l.text + " непонятных единиц.")
-    bot.sendPhoto(chat_id = update.message.chat_id, photo = 'https://telegram.org/img/t_logo.png')
+    update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
+    bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
 
 def info(bot, update):
+    update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
+                              "отправь /auth password.\n" + \
+                                "Сейчас доступна только свободная информация.\n")
     tempOut(bot, update)
 
 def echo(bot, update):
     #update.message.reply_text(update.message.text)
-    update.message.reply_text("Для получения информации набери /info <- или нажми")
+    update.message.reply_text("Для получения информации набери /info <- или нажми\n" + \
+                                "Для авторизации отправь /auth password.")
 
 def auth(bot, update):
     if config['telegtam']['password'] in update.message.text:
@@ -65,7 +70,7 @@ def auth(bot, update):
         custom_keyboard = [
             ['Включить_обогреватели', '/Выключить_обогреватели'],
             ['/Включить_прожектор', '/Выключить_прожектор'],
-            ['/Температура']
+            ['Улица', 'Комната']
         ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
         bot.sendMessage(
@@ -132,7 +137,22 @@ def heaters_off(bot, update):
     logger.info('outdoor_light_off')
     bot.sendMessage(chat_id = update.message.chat_id, text = 'outdoor_light_off')
 
-
+@log
+@auth_required
+def tempIn(bot, update):
+    # Температура
+    t_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['Temp']
+    t = requests.get(t_url)
+    update.message.reply_text("Температура в комнате" + t.text + " градусов")
+    # Влажность
+    d_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['Dump']
+    d = requests.get(d_url)
+    update.message.reply_text("Влажность " + d.text + " %")
+    # CO2
+    co2_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['CO2']
+    co2 = requests.get(co2_url)
+    update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
+    bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
@@ -144,7 +164,9 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("info", info))
-    dp.add_handler(CommandHandler('Температура', tempOut))
+
+    dp.add_handler(CommandHandler('Улица', tempOut))
+    dp.add_handler(CommandHandler('Комната', tempIn))
 
     dp.add_handler(CommandHandler('auth', auth))
 
