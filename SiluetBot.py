@@ -59,7 +59,7 @@ def tempOut(bot, update):
     update.message.reply_text("Солнышко светит на  " + l.text + " непонятных единиц.")
 
     pic = getImg(ur['S7_1200']['url_img'])
-    bot.sendPhoto(chat_id = chat_id, photo = pic)
+    bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
