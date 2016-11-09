@@ -59,7 +59,8 @@ def help(bot, update):
 def getImg (url):
     r = requests.get(url)
     with io.BytesIO(r.content) as f:
-        return f
+        with Image.open(f) as img:
+            return img
 
 def tempOut(bot, update):
     # Температура
