@@ -37,6 +37,19 @@ def start(bot, update):
 def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
 
+def getImg (url):
+    try:
+        pic = requests.get(img)
+        out = open("...\img.jpg", "wb")
+        out.write(pic.content)
+        out.close()
+
+    except e:
+        logger.info(e)
+        return None, "*Ошибка!*\n`{}`".format(e)
+
+    return pic, None
+
 def tempOut(bot, update):
     # Температура
     t_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Temp']
@@ -50,7 +63,9 @@ def tempOut(bot, update):
     l_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Light']
     l = requests.get(l_url)
     update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
-    bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
+
+    p = getImg(ur['S7_1200']['url_img'])
+    bot.sendPhoto(chat_id = chat_id, photo = p)
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
@@ -68,8 +83,8 @@ def auth(bot, update):
         if update.message.chat_id not in config['telegtam']['authenticated_users']:
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
         custom_keyboard = [
-            ['Включить_обогреватели', '/Выключить_обогреватели'],
-            ['/Включить_прожектор', '/Выключить_прожектор'],
+            ['Включить_обогреватели', 'Выключить_обогреватели'],
+            ['Включить_прожектор', 'Выключить_прожектор'],
             ['Улица', 'Комната']
         ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
@@ -152,7 +167,7 @@ def tempIn(bot, update):
     co2_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['CO2']
     co2 = requests.get(co2_url)
     update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
-    bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
+    #bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
