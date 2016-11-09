@@ -51,7 +51,7 @@ def auth(bot, update):
             reply_markup = reply_markup
         )
         logger.info('Send message: {}'.format(update.message.chat_id))
-        update.message.reply_text("Ваш id" + str(update.message.chat_id))
+        update.message.reply_text("Ваш id " + str(update.message.chat_id))
     else:
         bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
 
