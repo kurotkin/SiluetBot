@@ -4,6 +4,7 @@
 # https://pypi.python.org/pypi/python-telegram-bot/#installing
 # pip install PyYAML
 # python -m pip install --upgrade pip
+# pip install Pillow
 
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Job
@@ -17,7 +18,7 @@ import yaml
 import requests
 import urllib.request
 from PIL import Image
-from StringIO import StringIO
+from io import StringIO
 
 im_sun = 'CAPTURE \xE2\x98\x80'
 
