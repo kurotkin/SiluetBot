@@ -18,7 +18,7 @@ import yaml
 import requests
 import urllib.request
 from PIL import Image
-from io import StringIO
+import io
 
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
