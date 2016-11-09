@@ -38,17 +38,11 @@ def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
 
 def getImg (url):
-    try:
-        pic = requests.get(img)
-        out = open("...\img.jpg", "wb")
-        out.write(pic.content)
-        out.close()
-
-    except e:
-        logger.info(e)
-        return None, "*Ошибка!*\n`{}`".format(e)
-
-    return pic, None
+    pic = requests.get(img)
+    out = open("...\img.jpg", "wb")
+    out.write(pic.content)
+    out.close()
+    return pic
 
 def tempOut(bot, update):
     # Температура
