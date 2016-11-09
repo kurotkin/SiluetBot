@@ -163,7 +163,7 @@ def tempIn(bot, update):
     # CO2
     co2_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['CO2']
     co2 = requests.get(co2_url)
-    update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
+    update.message.reply_text("Содержание углекислого газа " + co2.text + " ppm")
     #bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
 
 def main():
