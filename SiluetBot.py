@@ -20,8 +20,6 @@ import urllib.request
 from PIL import Image
 from io import StringIO
 
-im_sun = 'CAPTURE \xE2\x98\x80'
-
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
 ur = yaml.load(open('conf_s7-1200.yaml'))
@@ -42,7 +40,8 @@ def help(bot, update):
 
 def getImg (url):
     r = requests.get(url)
-    pic = Image.open(StringIO(r.content))
+    with io.BytesIO(r.content) as f:
+    with Image.open(f) as pic:
     return pic
 
 def tempOut(bot, update):
@@ -57,7 +56,7 @@ def tempOut(bot, update):
     # Яркость
     l_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Light']
     l = requests.get(l_url)
-    update.message.reply_text(im_sun + " Солнышко светит на  " + l.text + " непонятных единиц.")
+    update.message.reply_text("Солнышко светит на  " + l.text + " непонятных единиц.")
 
     pic = getImg(ur['S7_1200']['url_img'])
     bot.sendPhoto(chat_id = chat_id, photo = pic)
