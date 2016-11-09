@@ -59,8 +59,7 @@ def help(bot, update):
 def getImg (url):
     r = requests.get(url)
     with io.BytesIO(r.content) as f:
-        with Image.open(f) as pic:
-            return pic
+        return f
 
 def tempOut(bot, update):
     # Температура
@@ -77,6 +76,7 @@ def tempOut(bot, update):
     update.message.reply_text("Солнышко светит на  " + l.text + " непонятных единиц.")
 
     pic = getImg(ur['S7_1200']['url_img'])
+    #bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
     bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
 
 def info(bot, update):
