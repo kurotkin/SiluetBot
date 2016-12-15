@@ -155,7 +155,7 @@ def heaters_off(bot, update):
 def In(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text("Температура в комнате" + getVal(r, 'in', 'temp') + " градусов")
+    update.message.reply_text("Температура в комнате " + getVal(r, 'in', 'temp') + " градусов")
     # Влажность
     update.message.reply_text("Влажность " + getVal(r, 'in', 'dump') + " %")
     # CO2
@@ -166,9 +166,32 @@ def In(bot, update):
 def Balc(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text("Температура на балконе" + getVal(r, 'balc', 'temp') + " градусов")
+    update.message.reply_text("Температура на балконе " + getVal(r, 'balc', 'temp') + " градусов")
     # Влажность
     update.message.reply_text("Влажность " + getVal(r, 'balc', 'dump') + " %")
+
+
+def check_temperature(bot, job):
+    """Переодическая проверка температуры с датчиков
+
+    Eсли температура ниже, чем установленный минимум -
+    посылаем уведомление зарегистрированным пользователям
+    """
+    r = requests.get(jsonUrl)
+    # Температура
+    tempString = getVal(r, 'balc', 'temp')
+    temp = float(tempString)
+
+    if temp < 15.0:
+        for user_chat in config['telegtam']['authenticated_users']:
+            bot.sendMessage(
+                chat_id = user_chat,
+                parse_mode = ParseMode.MARKDOWN,
+                text='*Температура ниже {} градусов: {}!*'.format(
+                    15.0,
+                    temp
+                )
+            )
 
 
 def main():
@@ -176,6 +199,7 @@ def main():
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
+    job_queue = updater.job_queue
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
@@ -196,7 +220,7 @@ def main():
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
-
+    job_queue.put(Job(check_temperature, 60*30), next_t=60*6)
 
     dp.add_error_handler(error)
     updater.start_polling()
