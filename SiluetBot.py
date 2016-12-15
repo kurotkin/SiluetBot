@@ -78,44 +78,22 @@ def tempOut(bot, update):
     
     # Температура
     update.message.reply_text("Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
-    
     # Влажность
     update.message.reply_text("Влажность " + getVal(r, 'out', 'dump') + " %")
-    
     # Давление
     update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
-    
     # Яркость
     update.message.reply_text("Солнышко светит на  " + getVal(r, 'out', 'light') + " лк")
-
-def tempOut_old(bot, update):
-    # Температура
-    t_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Temp']
-    t = requests.get(t_url)
-    update.message.reply_text("Температура на улице " + t.text + " градусов")
-    # Влажность
-    d_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Dump']
-    d = requests.get(d_url)
-    update.message.reply_text("Влажность " + d.text + " %")
-    # Яркость
-    l_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Light']
-    l = requests.get(l_url)
-    update.message.reply_text("Солнышко светит на  " + l.text + " непонятных единиц.")
-
-    pic = getImg(ur['S7_1200']['url_img'])
-    #bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
-    #bot.sendPhoto(chat_id = update.message.chat_id, photo = pic)
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
                               "отправь /auth password.\n" + \
-                                "Сейчас доступна только свободная информация.\n")
+                                "Сейчас доступна только свободная информация.\n" + \
+                                "Для получения информации набери /info <- или нажми\n)
     tempOut(bot, update)
 
 def echo(bot, update):
-    #update.message.reply_text(update.message.text)
-    update.message.reply_text("Для получения информации набери /info <- или нажми\n" + \
-                                "Для авторизации отправь /auth password.")
+    info(bot, update)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
@@ -176,19 +154,15 @@ def heaters_off(bot, update):
 @log
 @auth_required
 def tempIn(bot, update):
+    jsonUrl = ur['S7_1200']['jsonUrl']
+    r = requests.get(jsonUrl)
     # Температура
-    t_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['Temp']
-    t = requests.get(t_url)
-    update.message.reply_text("Температура в комнате" + t.text + " градусов")
+    update.message.reply_text("Температура в комнате" + getVal(r, 'in', 'temp') + " градусов")
     # Влажность
-    d_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['Dump']
-    d = requests.get(d_url)
-    update.message.reply_text("Влажность " + d.text + " %")
+    update.message.reply_text("Влажность " + getVal(r, 'in', 'dump') + " %")
     # CO2
-    co2_url = ur['S7_1200']['url'] + ur['S7_1200']['In']['CO2']
-    co2 = requests.get(co2_url)
-    update.message.reply_text("Содержание углекислого газа " + co2.text + " ppm")
-    #bot.sendPhoto(chat_id = update.message.chat_id, photo = ur['S7_1200']['url_img'])
+    update.message.reply_text("Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
+
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
