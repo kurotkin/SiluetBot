@@ -11,6 +11,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Job
 from telegram import ReplyKeyboardMarkup, ParseMode
 import logging
 import os
+import json
 import logging
 import functools
 
@@ -40,8 +41,7 @@ def auth(bot, update):
         if update.message.chat_id not in config['telegtam']['authenticated_users']:
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
         custom_keyboard = [
-            ['/Включить_обогреватели', '/Выключить_обогреватели'],
-            ['/Включить_прожектор', '/Выключить_прожектор'],
+            ['/Балкон'],
             ['/Улица', '/Комната']
         ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
@@ -64,7 +64,31 @@ def getImg (url):
         with Image.open(f) as img:
             return img
 
+def getVal (req, location, sign):
+    parsed_r = json.loads(r.text)
+    for obj in parsed_r:
+        if obj['name'] == location:
+            for cont in obj['content']:
+                if cont['name'] == sign:
+                    return cont['val']
+
 def tempOut(bot, update):
+    jsonUrl = ur['S7_1200']['jsonUrl']
+    r = requests.get(jsonUrl)
+    
+    # Температура
+    update.message.reply_text("Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
+    
+    # Влажность
+    update.message.reply_text("Влажность " + getVal(r, 'out', 'dump') + " %")
+    
+    # Давление
+    update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
+    
+    # Яркость
+    update.message.reply_text("Солнышко светит на  " + getVal(r, 'out', 'light') + " лк")
+
+def tempOut_old(bot, update):
     # Температура
     t_url = ur['S7_1200']['url'] + ur['S7_1200']['Out']['Temp']
     t = requests.get(t_url)
