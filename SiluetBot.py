@@ -65,7 +65,7 @@ def getImg (url):
             return img
 
 def getVal (req, location, sign):
-    parsed_r = json.loads(r.text)
+    parsed_r = json.loads(req.text)
     for obj in parsed_r:
         if obj['name'] == location:
             for cont in obj['content']:
