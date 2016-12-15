@@ -24,6 +24,7 @@ import io
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
 ur = yaml.load(open('conf_s7-1200.yaml'))
+jsonUrl = ur['S7_1200']['jsonUrl']
 
 # Базовые настройка логирования
 logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -72,10 +73,8 @@ def getVal (req, location, sign):
                 if cont['name'] == sign:
                     return cont['val']
 
-def tempOut(bot, update):
-    jsonUrl = ur['S7_1200']['jsonUrl']
+def Out(bot, update):
     r = requests.get(jsonUrl)
-    
     # Температура
     update.message.reply_text("Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
     # Влажность
@@ -90,7 +89,7 @@ def info(bot, update):
                               "отправь /auth password.\n" + \
                                 "Сейчас доступна только свободная информация.\n" + \
                                 "Для получения информации набери /info <- или нажми\n)
-    tempOut(bot, update)
+    Out(bot, update)
 
 def echo(bot, update):
     info(bot, update)
@@ -153,8 +152,7 @@ def heaters_off(bot, update):
 
 @log
 @auth_required
-def tempIn(bot, update):
-    jsonUrl = ur['S7_1200']['jsonUrl']
+def In(bot, update):
     r = requests.get(jsonUrl)
     # Температура
     update.message.reply_text("Температура в комнате" + getVal(r, 'in', 'temp') + " градусов")
@@ -162,6 +160,15 @@ def tempIn(bot, update):
     update.message.reply_text("Влажность " + getVal(r, 'in', 'dump') + " %")
     # CO2
     update.message.reply_text("Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
+
+@log
+@auth_required
+def Balc(bot, update):
+    r = requests.get(jsonUrl)
+    # Температура
+    update.message.reply_text("Температура на балконе" + getVal(r, 'balc', 'temp') + " градусов")
+    # Влажность
+    update.message.reply_text("Влажность " + getVal(r, 'balc', 'dump') + " %")
 
 
 def main():
@@ -175,8 +182,9 @@ def main():
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("info", info))
 
-    dp.add_handler(CommandHandler('Улица', tempOut))
-    dp.add_handler(CommandHandler('Комната', tempIn))
+    dp.add_handler(CommandHandler('Улица', Out))
+    dp.add_handler(CommandHandler('Комната', In))
+    dp.add_handler(CommandHandler('Балкон', Balc))
 
     dp.add_handler(CommandHandler('auth', auth))
 
