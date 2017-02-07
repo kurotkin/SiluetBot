@@ -6,6 +6,12 @@
 # python -m pip install --upgrade pip
 # pip install Pillow
 
+#sudo apt-get install python3-pip
+#sudo pip3 install requests --upgrade
+#sudo pip3 install PyYAML
+#sudo pip3 install python-telegram-bot
+
+
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Job
 from telegram import ReplyKeyboardMarkup, ParseMode
@@ -18,7 +24,7 @@ import functools
 import yaml
 import requests
 import urllib.request
-from PIL import Image
+#from PIL import Image
 import io
 
 # Получаем конфигруационные данные из файла
@@ -59,11 +65,11 @@ def auth(bot, update):
 def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
 
-def getImg (url):
-    r = requests.get(url)
-    with io.BytesIO(r.content) as f:
-        with Image.open(f) as img:
-            return img
+# def getImg (url):
+#     r = requests.get(url)
+#     with io.BytesIO(r.content) as f:
+#         with Image.open(f) as img:
+#             return img
 
 def getVal (req, location, sign):
     parsed_r = json.loads(req.text)
@@ -82,13 +88,13 @@ def Out(bot, update):
     # Давление
     update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
     # Яркость
-    update.message.reply_text("Солнышко светит на  " + getVal(r, 'out', 'light') + " лк")
+    update.message.reply_text("Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
                               "отправь /auth password.\n" + \
-                                "Сейчас доступна только свободная информация.\n" + \
-                                "Для получения информации набери /info <- или нажми\n")
+                              "Сейчас доступна только свободная информация.\n" + \
+                              "Для получения информации набери /info <- или нажми\n")
     Out(bot, update)
 
 def echo(bot, update):
