@@ -36,7 +36,8 @@ emj_sun = emoji.emojize(":sun:", use_aliases = True)
 emj_droplet = emoji.emojize(":droplet:", use_aliases = True)
 emj_snowflake = emoji.emojize(":snowflake:", use_aliases = True)
 emj_test = emoji.emojize(":clipboard:", use_aliases = True)
-emj_back = emoji.emojize(":BACK_arrow:", use_aliases = True)
+emj_back = emoji.emojize(":left_arrow:", use_aliases = True)
+emj_exclamation_mark = emoji.emojize(":exclamation_mark:", use_aliases = True)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -165,7 +166,7 @@ def heaters_off(bot, update):
 @auth_required
 def openTestMenu(bot, update):
     custom_keyboard = [
-        ['/Основное меню ' + emj_back, '/Тест температуры ' + emj_bellhop_bell]
+        ['/Основное_меню ' + emj_back, '/Тест_температуры ' + emj_bellhop_bell]
     ]
     reply_markup = ReplyKeyboardMarkup(custom_keyboard)
     bot.sendMessage(
@@ -198,7 +199,7 @@ def testTemp(bot, update):
         bot.sendMessage(
             chat_id = user_chat,
             parse_mode = ParseMode.MARKDOWN,
-            text = "*Внимание! Процесс тестирования!*\n" + \
+            text = emj_exclamation_mark + " *Внимание! Процесс тестирования!*\n" + \
                 emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp) + emj_snowflake
         )
 
@@ -262,8 +263,8 @@ def main():
     dp.add_handler(CommandHandler('auth', auth))
 
     dp.add_handler(CommandHandler('Тест', openTestMenu))
-    dp.add_handler(CommandHandler("Основное меню", openMainMenu))
-    dp.add_handler(CommandHandler("Тест температуры", testTemp))
+    dp.add_handler(CommandHandler("Основное_меню", openMainMenu))
+    dp.add_handler(CommandHandler("Тест_температуры", testTemp))
 
     dp.add_handler(CommandHandler('Включить_обогреватели', heaters_on))
     dp.add_handler(CommandHandler('Выключить_обогреватели', heaters_off))
