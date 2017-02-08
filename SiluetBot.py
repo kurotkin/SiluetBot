@@ -32,14 +32,15 @@ emj_warning = emoji.emojize(":warning:", use_aliases = True)
 emj_balc = emoji.emojize(":classical_building:", use_aliases = True)
 emj_bellhop_bell= emoji.emojize(":bellhop_bell:", use_aliases = True)
 emj_thermometer = emoji.emojize(":thermometer:", use_aliases = True)
-emj_sun = emoji.emojize(":sun:", use_aliases = True)
+emj_sun = emoji.emojize(":sun with face:", use_aliases = True)
 emj_droplet = emoji.emojize(":droplet:", use_aliases = True)
 emj_snowflake = emoji.emojize(":snowflake:", use_aliases = True)
 emj_test = emoji.emojize(":clipboard:", use_aliases = True)
-emj_back = emoji.emojize(":left_arrow:", use_aliases = True)
+emj_back = emoji.emojize(":door:", use_aliases = True)
 emj_exclamation_mark = emoji.emojize(":exclamation_mark:", use_aliases = True)
 emj_press = emoji.emojize(":crystal_ball:", use_aliases = True)
-emj_co2 = emoji.emojize(":wind_face:", use_aliases = True)
+emj_co2 = emoji.emojize(":fog:", use_aliases = True)
+emj_settings = emoji.emojize(":gear:", use_aliases = True)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -52,7 +53,7 @@ def auth(bot, update):
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
         custom_keyboard = [
             ['/Балкон ' + emj_balc, '/Тест ' + emj_test],
-            ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp]
+            ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp', /Настройки ' + emj_settings]
         ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
         bot.sendMessage(
@@ -191,8 +192,6 @@ def openMainMenu(bot, update):
         reply_markup = reply_markup
     )
 
-@log
-@auth_required
 def testTemp(bot, update):
     r = requests.get(jsonUrl)
     tempString = getVal(r, 'balc', 'temp')
@@ -202,7 +201,7 @@ def testTemp(bot, update):
             chat_id = user_chat,
             parse_mode = ParseMode.MARKDOWN,
             text = emj_exclamation_mark + " *Внимание! Процесс тестирования!*\n" + \
-                emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp) + emj_snowflake
+                emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp)
         )
 
 @log
@@ -214,7 +213,7 @@ def In(bot, update):
     # Влажность
     update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'in', 'dump') + " %")
     # CO2
-    update.message.reply_text(emj_co2 + "Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
+    update.message.reply_text(emj_co2 + " Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
 
 @log
 @auth_required
