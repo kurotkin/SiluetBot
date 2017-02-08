@@ -25,10 +25,10 @@ logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message
 logger = logging.getLogger(__name__)
 
 # emoji
-emj_cake = emojize(":cake:", use_aliases = True)
-emj_cityscape = emojize(":cityscape:", use_aliases = True)
-emj_couch_and_lamp = emojize(":couch_and_lamp:", use_aliases = True)
-emj_warning = emojize(":warning:", use_aliases = True)
+emj_cake = emoji.emojize(":cake:", use_aliases = True)
+emj_cityscape = emoji.emojize(":cityscape:", use_aliases = True)
+emj_couch_and_lamp = emoji.emojize(":couch_and_lamp:", use_aliases = True)
+emj_warning = emoji.emojize(":warning:", use_aliases = True)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
