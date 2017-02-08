@@ -53,8 +53,7 @@ def auth(bot, update):
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
         custom_keyboard = [
             ['/Балкон ' + emj_balc, '/Тест ' + emj_test],
-            ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp', /Настройки ' + emj_settings]
-        ]
+            ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp, '/Настройки ' + emj_settings]        ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
         bot.sendMessage(
             chat_id = update.message.chat_id,
