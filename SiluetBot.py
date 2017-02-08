@@ -38,6 +38,8 @@ emj_snowflake = emoji.emojize(":snowflake:", use_aliases = True)
 emj_test = emoji.emojize(":clipboard:", use_aliases = True)
 emj_back = emoji.emojize(":left_arrow:", use_aliases = True)
 emj_exclamation_mark = emoji.emojize(":exclamation_mark:", use_aliases = True)
+emj_press = emoji.emojize(":crystal_ball:", use_aliases = True)
+emj_co2 = emoji.emojize(":wind_face:", use_aliases = True)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -89,7 +91,7 @@ def Out(bot, update):
     # Влажность
     update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'out', 'dump') + " %")
     # Давление
-    update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
+    update.message.reply_text(emj_press + " Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
     # Яркость
     update.message.reply_text(emj_sun + " Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
     # Картинка с улицы
@@ -212,7 +214,7 @@ def In(bot, update):
     # Влажность
     update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'in', 'dump') + " %")
     # CO2
-    update.message.reply_text("Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
+    update.message.reply_text(emj_co2 + "Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
 
 @log
 @auth_required
@@ -240,7 +242,7 @@ def check_temperature(bot, job):
             bot.sendMessage(
                 chat_id = user_chat,
                 parse_mode = ParseMode.MARKDOWN,
-                text = emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp) + emj_snowflake
+                text = emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp)
             )
 
 
