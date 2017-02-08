@@ -63,7 +63,7 @@ def auth(bot, update):
     else:
         bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
 def getImage():
-    data = urllib.request.urlopen(url).read()
+    data = urllib.request.urlopen(config['Cam1']).read()
     fo = open('img.jpg', 'w')
     print (data, file = fo)
     fo.close()
