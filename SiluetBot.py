@@ -1,16 +1,4 @@
 #!/usr/bin/python3
-# Библиотеки:
-# http://docs.python-requests.org/en/master/user/quickstart/
-# https://pypi.python.org/pypi/python-telegram-bot/#installing
-# pip install PyYAML
-# python -m pip install --upgrade pip
-# pip install Pillow
-
-#sudo apt-get install python3-pip
-#sudo pip3 install requests --upgrade
-#sudo pip3 install PyYAML
-#sudo pip3 install python-telegram-bot
-#sudo pip3 install emoji --upgrade
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Job
 from telegram import ReplyKeyboardMarkup, ParseMode
