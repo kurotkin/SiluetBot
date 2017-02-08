@@ -26,6 +26,7 @@ import requests
 import urllib.request
 #from PIL import Image
 import io
+import urllib.request
 
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
@@ -61,6 +62,11 @@ def auth(bot, update):
         update.message.reply_text("Ваш id " + str(update.message.chat_id))
     else:
         bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
+def getImage():
+    data = urllib.request.urlopen(url).read()
+    fo = open('img.jpg', 'w')
+    print (data, file = fo)
+    fo.close()
 
 def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
@@ -80,6 +86,7 @@ def getVal (req, location, sign):
                     return cont['val']
 
 def Out(bot, update):
+    getImage()
     r = requests.get(jsonUrl)
     # Температура
     update.message.reply_text("Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
@@ -89,6 +96,8 @@ def Out(bot, update):
     update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
     # Яркость
     update.message.reply_text("Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
+    bot.sendPhoto(chat_id = update.message.chat_id, photo = open('img.jpg', 'rb'))
+
 
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
