@@ -10,8 +10,7 @@
 #sudo pip3 install requests --upgrade
 #sudo pip3 install PyYAML
 #sudo pip3 install python-telegram-bot
-
-
+#sudo pip3 install emoji --upgrade
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Job
 from telegram import ReplyKeyboardMarkup, ParseMode
@@ -20,13 +19,11 @@ import os
 import json
 import logging
 import functools
-
 import yaml
 import requests
 import urllib.request
-#from PIL import Image
 import io
-import urllib.request
+import emoji
 
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
@@ -39,6 +36,12 @@ logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message
 
 logger = logging.getLogger(__name__)
 
+# emoji
+emj_cake = emojize(":cake:", use_aliases = True)
+emj_cityscape = emojize(":cityscape:", use_aliases = True)
+emj_couch_and_lamp = emojize(":couch_and_lamp:", use_aliases = True)
+emj_warning = emojize(":warning:", use_aliases = True)
+
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
@@ -49,8 +52,8 @@ def auth(bot, update):
         if update.message.chat_id not in config['telegtam']['authenticated_users']:
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
         custom_keyboard = [
-            ['/Балкон'],
-            ['/Улица', '/Комната']
+            ['/Балкон', '/Тест'],
+            [emj_cityscape + '/Улица', emj_couch_and_lamp + '/Комната']
         ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
         bot.sendMessage(
@@ -62,20 +65,17 @@ def auth(bot, update):
         update.message.reply_text("Ваш id " + str(update.message.chat_id))
     else:
         bot.sendMessage(chat_id = update.message.chat_id, text = "Неправильный пароль.")
-def getImage():
-    data = urllib.request.urlopen(config['Cam1']).read()
-    fo = open('img.jpg', 'w')
-    print (data, file = fo)
-    fo.close()
+
+def getImage(url_img):
+    name_img = "img.jpg"
+    p = requests.get(url_img)
+    out = open(name_img, "wb")
+    out.write(p.content)
+    out.close()
+    return name_img
 
 def help(bot, update):
     update.message.reply_text("Для получения информации набери /info <- или нажми")
-
-# def getImg (url):
-#     r = requests.get(url)
-#     with io.BytesIO(r.content) as f:
-#         with Image.open(f) as img:
-#             return img
 
 def getVal (req, location, sign):
     parsed_r = json.loads(req.text)
@@ -86,7 +86,6 @@ def getVal (req, location, sign):
                     return cont['val']
 
 def Out(bot, update):
-    getImage()
     r = requests.get(jsonUrl)
     # Температура
     update.message.reply_text("Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
@@ -96,7 +95,9 @@ def Out(bot, update):
     update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
     # Яркость
     update.message.reply_text("Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
-    bot.sendPhoto(chat_id = update.message.chat_id, photo = open('img.jpg', 'rb'))
+    # Картинка с улицы
+    name_img = getImage(config['Cam1'])
+    bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
 
 
 def info(bot, update):
@@ -202,7 +203,7 @@ def check_temperature(bot, job):
             bot.sendMessage(
                 chat_id = user_chat,
                 parse_mode = ParseMode.MARKDOWN,
-                text='*Температура ниже {} градусов: {}!*'.format(
+                text = emj_warning + '*Температура ниже {} градусов: {}!*'.format(
                     15.0,
                     temp
                 )
