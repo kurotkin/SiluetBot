@@ -29,6 +29,14 @@ emj_cake = emoji.emojize(":cake:", use_aliases = True)
 emj_cityscape = emoji.emojize(":cityscape:", use_aliases = True)
 emj_couch_and_lamp = emoji.emojize(":couch_and_lamp:", use_aliases = True)
 emj_warning = emoji.emojize(":warning:", use_aliases = True)
+emj_balc = emoji.emojize(":classical_building:", use_aliases = True)
+emj_bellhop_bell= emoji.emojize(":bellhop_bell:", use_aliases = True)
+emj_thermometer = emoji.emojize(":thermometer:", use_aliases = True)
+emj_sun = emoji.emojize(":sun:", use_aliases = True)
+emj_droplet = emoji.emojize(":droplet:", use_aliases = True)
+emj_snowflake = emoji.emojize(":snowflake:", use_aliases = True)
+emj_test = emoji.emojize(":clipboard:", use_aliases = True)
+emj_back = emoji.emojize(":BACK_arrow:", use_aliases = True)
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -40,8 +48,8 @@ def auth(bot, update):
         if update.message.chat_id not in config['telegtam']['authenticated_users']:
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
         custom_keyboard = [
-            ['/Балкон', '/Тест'],
-            [emj_cityscape + '/Улица', emj_couch_and_lamp + '/Комната']
+            ['/Балкон ' + emj_balc, '/Тест ' + emj_test],
+            ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp]
         ]
         reply_markup = ReplyKeyboardMarkup(custom_keyboard)
         bot.sendMessage(
@@ -76,13 +84,13 @@ def getVal (req, location, sign):
 def Out(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text("Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
+    update.message.reply_text(emj_thermometer + " Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
     # Влажность
-    update.message.reply_text("Влажность " + getVal(r, 'out', 'dump') + " %")
+    update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'out', 'dump') + " %")
     # Давление
     update.message.reply_text("Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
     # Яркость
-    update.message.reply_text("Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
+    update.message.reply_text(emj_sun + " Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
     # Картинка с улицы
     name_img = getImage(config['Cam1'])
     bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
@@ -91,8 +99,7 @@ def Out(bot, update):
 def info(bot, update):
     update.message.reply_text("Для получения дополнительной информации авторизируйся,\n" + \
                               "отправь /auth password.\n" + \
-                              "Сейчас доступна только свободная информация.\n" + \
-                              "Для получения информации набери /info <- или нажми\n")
+                              "Сейчас доступна только свободная информация.\n")
     Out(bot, update)
 
 def echo(bot, update):
@@ -156,12 +163,53 @@ def heaters_off(bot, update):
 
 @log
 @auth_required
+def openTestMenu(bot, update):
+    custom_keyboard = [
+        ['/Основное меню ' + emj_back, '/Тест температуры ' + emj_bellhop_bell]
+    ]
+    reply_markup = ReplyKeyboardMarkup(custom_keyboard)
+    bot.sendMessage(
+        chat_id = update.message.chat_id,
+        text = "Меню тестирования",
+        reply_markup = reply_markup
+    )
+
+@log
+@auth_required
+def openMainMenu(bot, update):
+    custom_keyboard = [
+        ['/Балкон ' + emj_balc, '/Тест ' + emj_test],
+        ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp]
+    ]
+    reply_markup = ReplyKeyboardMarkup(custom_keyboard)
+    bot.sendMessage(
+        chat_id = update.message.chat_id,
+        text = "Основное меню",
+        reply_markup = reply_markup
+    )
+
+@log
+@auth_required
+def testTemp(bot, update):
+    r = requests.get(jsonUrl)
+    tempString = getVal(r, 'balc', 'temp')
+    temp = float(tempString)
+    for user_chat in config['telegtam']['authenticated_users']:
+        bot.sendMessage(
+            chat_id = user_chat,
+            parse_mode = ParseMode.MARKDOWN,
+            text = "*Внимание! Процесс тестирования!*\n" + \
+                emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp) + emj_snowflake
+        )
+
+@log
+@auth_required
 def In(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text("Температура в комнате " + getVal(r, 'in', 'temp') + " градусов")
+    update.message.reply_text(emj_thermometer + " Температура в комнате " + getVal(r, 'in', 'temp') + " градусов")
     # Влажность
-    update.message.reply_text("Влажность " + getVal(r, 'in', 'dump') + " %")
+    update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'in', 'dump') + " %")
     # CO2
     update.message.reply_text("Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
 
@@ -170,9 +218,9 @@ def In(bot, update):
 def Balc(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text("Температура на балконе " + getVal(r, 'balc', 'temp') + " градусов")
+    update.message.reply_text(emj_thermometer + " Температура на балконе " + getVal(r, 'balc', 'temp') + " градусов")
     # Влажность
-    update.message.reply_text("Влажность " + getVal(r, 'balc', 'dump') + " %")
+    update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'balc', 'dump') + " %")
 
 
 def check_temperature(bot, job):
@@ -191,10 +239,7 @@ def check_temperature(bot, job):
             bot.sendMessage(
                 chat_id = user_chat,
                 parse_mode = ParseMode.MARKDOWN,
-                text = emj_warning + '*Температура ниже {} градусов: {}!*'.format(
-                    15.0,
-                    temp
-                )
+                text = emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp) + emj_snowflake
             )
 
 
@@ -215,6 +260,10 @@ def main():
     dp.add_handler(CommandHandler('Балкон', Balc))
 
     dp.add_handler(CommandHandler('auth', auth))
+
+    dp.add_handler(CommandHandler('Тест', openTestMenu))
+    dp.add_handler(CommandHandler("Основное меню", openMainMenu))
+    dp.add_handler(CommandHandler("Тест температуры", testTemp))
 
     dp.add_handler(CommandHandler('Включить_обогреватели', heaters_on))
     dp.add_handler(CommandHandler('Выключить_обогреватели', heaters_off))
