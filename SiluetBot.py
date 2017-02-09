@@ -238,7 +238,7 @@ def narodmon_send(bot, job):
     sock = socket.socket()
     try:
         sock.connect(('narodmon.ru', 8283))
-        sock.send(sendMess)
+        sock.send(sendMess.encode("utf-8"))
         data = sock.recv(1024)
         sock.close()
         logger.info(data)
