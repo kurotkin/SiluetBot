@@ -298,7 +298,7 @@ def main():
     job_queue.put(Job(check_temperature, 60*30), next_t = 60*6)
 
     # Every 5 minutes
-    job_queue.put(Job(narodmon_send, 60*5), next_t = 0)
+    job_queue.put(Job(narodmon_send, 60*6), next_t = 0)
 
     # Every 1 minutes
     #job_queue.put(Job(narodmon_send, 60 * 1), next_t = 0)
