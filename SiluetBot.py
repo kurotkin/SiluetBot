@@ -223,13 +223,12 @@ def Balc(bot, update):
     # Влажность
     update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'balc', 'dump') + " %")
 
-@log
 def narodmon_send():
     DEVICE_MAC = config['DEVICE_MAC']
-    SENSOR_ID_1 = DEVICE_MAC + '_01'
-    SENSOR_ID_2 = DEVICE_MAC + '_02'
-    #SENSOR_ID_3 = DEVICE_MAC + '_03'
-    SENSOR_ID_4 = DEVICE_MAC + '_04'
+    SENSOR_ID_1 = DEVICE_MAC + '-01'
+    SENSOR_ID_2 = DEVICE_MAC + '-02'
+    #SENSOR_ID_3 = DEVICE_MAC + '-03'
+    SENSOR_ID_4 = DEVICE_MAC + '-04'
     r = requests.get(jsonUrl)
     sendMess = "#{}\n#{}#{}\n#{}#{}\n##".format(DEVICE_MAC, 
                                                 SENSOR_ID_1, getVal(r, 'out', 'temp'), 
