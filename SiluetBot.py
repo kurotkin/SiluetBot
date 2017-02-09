@@ -223,7 +223,7 @@ def Balc(bot, update):
     # Влажность
     update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'balc', 'dump') + " %")
 
-def narodmon_send():
+def narodmon_send(bot, job):
     DEVICE_MAC = config['DEVICE_MAC']
     SENSOR_ID_1 = DEVICE_MAC + '-01'
     SENSOR_ID_2 = DEVICE_MAC + '-02'
@@ -295,10 +295,10 @@ def main():
     dp.add_handler(MessageHandler(Filters.text, echo))
 
     # Every 30 minutes
-    job_queue.put(Job(check_temperature, 60 * 30), next_t = 60*6)
+    job_queue.put(Job(check_temperature, 60*30), next_t = 60*6)
 
     # Every 5 minutes
-    job_queue.put(Job(narodmon_send, 60 * 5), next_t = 0)
+    job_queue.put(Job(narodmon_send, 60*5), next_t = 0)
 
     # Every 1 minutes
     #job_queue.put(Job(narodmon_send, 60 * 1), next_t = 0)
