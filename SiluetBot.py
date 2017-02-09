@@ -12,6 +12,7 @@ import requests
 import urllib.request
 import io
 import emoji
+import socket
 
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
@@ -194,15 +195,12 @@ def openMainMenu(bot, update):
     )
 
 def testTemp(bot, update):
-    r = requests.get(jsonUrl)
-    tempString = getVal(r, 'balc', 'temp')
-    temp = float(tempString)
     for user_chat in config['telegtam']['authenticated_users']:
         bot.sendMessage(
             chat_id = user_chat,
             parse_mode = ParseMode.MARKDOWN,
             text = emj_exclamation_mark + " *Внимание! Процесс тестирования!*\n" + \
-                emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp)
+                    emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, 15.0)
         )
 
 @log
@@ -225,6 +223,28 @@ def Balc(bot, update):
     # Влажность
     update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'balc', 'dump') + " %")
 
+@log
+def narodmon_send():
+    DEVICE_MAC = config['DEVICE_MAC']
+    SENSOR_ID_1 = DEVICE_MAC + '_01'
+    SENSOR_ID_2 = DEVICE_MAC + '_02'
+    #SENSOR_ID_3 = DEVICE_MAC + '_03'
+    SENSOR_ID_4 = DEVICE_MAC + '_04'
+    r = requests.get(jsonUrl)
+    sendMess = "#{}\n#{}#{}\n#{}#{}\n##".format(DEVICE_MAC, 
+                                                SENSOR_ID_1, getVal(r, 'out', 'temp'), 
+                                                SENSOR_ID_2, getVal(r, 'out', 'dump'),
+                                                #SENSOR_ID_3, getVal(r, 'out', 'press'),
+                                                SENSOR_ID_4, getVal(r, 'out', 'light') )
+    sock = socket.socket()
+    try:
+        sock.connect(('narodmon.ru', 8283))
+        sock.send(sendMess)
+        data = sock.recv(1024)
+        sock.close()
+        logger.info(data)
+    except socket.error, e:
+        logger.info('ERROR! Exception {}'.format(e))
 
 def check_temperature(bot, job):
     """Переодическая проверка температуры с датчиков
@@ -244,7 +264,6 @@ def check_temperature(bot, job):
                 parse_mode = ParseMode.MARKDOWN,
                 text = emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp)
             )
-
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
@@ -276,7 +295,16 @@ def main():
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
-    job_queue.put(Job(check_temperature, 60*30), next_t=60*6)
+    # Every 30 minutes
+    job_queue.put(Job(check_temperature, 60 * 30), next_t = 60*6)
+
+    # Every 5 minutes
+    job_queue.put(Job(narodmon_send, 60 * 5), next_t = 0)
+
+    # Every 1 minutes
+    #job_queue.put(Job(narodmon_send, 60 * 1), next_t = 0)
+
+
 
     dp.add_error_handler(error)
     updater.start_polling()
