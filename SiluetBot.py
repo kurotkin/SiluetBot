@@ -243,7 +243,7 @@ def narodmon_send():
         data = sock.recv(1024)
         sock.close()
         logger.info(data)
-    except socket.error, e:
+    except socket.error as e:
         logger.info('ERROR! Exception {}'.format(e))
 
 def check_temperature(bot, job):
