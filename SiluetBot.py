@@ -20,7 +20,8 @@ jsonUrl = ur['S7_1200']['jsonUrl']
 
 # Базовые настройка логирования
 logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level = logging.INFO)
+                    level = logging.INFO,
+                    filename = 'log.log')
 
 logger = logging.getLogger(__name__)
 
@@ -97,6 +98,7 @@ def Out(bot, update):
     # Картинка с улицы
     name_img = getImage(config['Cam1'])
     bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
+    os.remove(name_img)
 
 
 def info(bot, update):
