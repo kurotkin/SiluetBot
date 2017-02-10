@@ -95,7 +95,7 @@ def Out(bot, update):
     # Давление
     update.message.reply_text(emj_press + " Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
     # Яркость
-    update.message.reply_text(emj_sun + " Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
+    update.message.reply_text("Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
     # Картинка с улицы
     name_img = getImage(config['Cam1'])
     bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
@@ -283,8 +283,8 @@ def main():
     dp.add_handler(CommandHandler('auth', auth))
 
     dp.add_handler(CommandHandler('Тест', openTestMenu))
-    dp.add_handler(CommandHandler("Основное_меню", openMainMenu))
-    dp.add_handler(CommandHandler("Тест_температуры", testTemp))
+    dp.add_handler(CommandHandler('Основное_меню', openMainMenu))
+    dp.add_handler(CommandHandler('Тест_температуры', testTemp))
 
     dp.add_handler(CommandHandler('Включить_обогреватели', heaters_on))
     dp.add_handler(CommandHandler('Выключить_обогреватели', heaters_off))
@@ -298,7 +298,7 @@ def main():
     job_queue.put(Job(check_temperature, 60*30), next_t = 60*6)
 
     # Every 5 minutes
-    job_queue.put(Job(narodmon_send, 60*6), next_t = 0)
+    job_queue.put(Job(narodmon_send, 60*6), next_t = 60*6)
 
     # Every 1 minutes
     #job_queue.put(Job(narodmon_send, 60 * 1), next_t = 0)
