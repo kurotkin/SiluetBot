@@ -194,6 +194,8 @@ def openMainMenu(bot, update):
         reply_markup = reply_markup
     )
 
+@log
+@auth_required
 def testTemp(bot, update):
     for user_chat in config['telegtam']['authenticated_users']:
         bot.sendMessage(
@@ -227,14 +229,14 @@ def narodmon_send(bot, job):
     DEVICE_MAC = config['DEVICE_MAC']
     SENSOR_ID_1 = DEVICE_MAC + '01'
     SENSOR_ID_2 = DEVICE_MAC + '02'
-    #SENSOR_ID_3 = DEVICE_MAC + '03'
+    SENSOR_ID_3 = DEVICE_MAC + '03'
     SENSOR_ID_4 = DEVICE_MAC + '04'
     r = requests.get(jsonUrl)
-    sendMess = "#{}\n#{}#{}\n#{}#{}\n##".format(DEVICE_MAC, 
+    sendMess = "#{}\n#{}#{}\n#{}#{}\n#{}#{}\n#{}#{}\n##".format(DEVICE_MAC, 
                                                 SENSOR_ID_1, getVal(r, 'out', 'temp'), 
                                                 SENSOR_ID_2, getVal(r, 'out', 'dump'),
-                                                #SENSOR_ID_3, getVal(r, 'out', 'press'),
-                                                SENSOR_ID_4, getVal(r, 'out', 'light') )
+                                                SENSOR_ID_3, getVal(r, 'out', 'press'),
+                                                SENSOR_ID_4, getVal(r, 'out', 'light'))
     sock = socket.socket()
     try:
         sock.connect(('narodmon.ru', 8283))
