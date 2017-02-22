@@ -108,17 +108,25 @@ def getVal (req, location, sign):
 def Out(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text(emj_thermometer + " Температура на улице " + getVal(r, 'out', 'temp') + " градусов")
+    t_text = " Температура на улице " + getVal(r, 'out', 'temp') + " градусов"
+    update.message.reply_text(emj_thermometer + t_text)
     # Влажность
-    update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'out', 'dump') + " %")
+    d_temp = " Влажность " + getVal(r, 'out', 'dump') + " %"
+    update.message.reply_text(emj_droplet + d_temp)
     # Давление
-    update.message.reply_text(emj_press + " Давление " + getVal(r, 'out', 'press') + " мм.рт.ст.")
+    p_text = " Давление " + getVal(r, 'out', 'press') + " мм.рт.ст."
+    update.message.reply_text(emj_press + p_text)
     # Яркость
-    update.message.reply_text("Солнце светит на  " + getVal(r, 'out', 'light') + " лк")
+    l_text = " Солнце светит на  " + getVal(r, 'out', 'light') + " лк"
+    update.message.reply_text(l_text)
+    # Голос
+    name_mp3 = getSpeech(t_text + d_text + p_text + l_text)
     # Картинка с улицы
     name_img = getImage(config['Cam1'])
     bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
     os.remove(name_img)
+    bot.sendAudio(chat_id = update.message.chat_id, audio = open(name_mp3, 'rb'))
+    os.remove(name_mp3)
 
 
 def info(bot, update):
@@ -229,20 +237,31 @@ def testTemp(bot, update):
 def In(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text(emj_thermometer + " Температура в комнате " + getVal(r, 'in', 'temp') + " градусов")
+    t_text = " Температура в комнате " + getVal(r, 'in', 'temp') + " градусов"
+    update.message.reply_text(emj_thermometer + t_text)
     # Влажность
-    update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'in', 'dump') + " %")
+    d_text = " Влажность " + getVal(r, 'in', 'dump') + " %"
+    update.message.reply_text(emj_droplet + d_text)
     # CO2
-    update.message.reply_text(emj_co2 + " Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm")
+    co2_text = " Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm"
+    name_mp3 = getSpeech(t_text + d_text + co2_text)
+    update.message.reply_text(emj_co2 + co2_text)
+    bot.sendAudio(chat_id = update.message.chat_id, audio = open(name_mp3, 'rb'))
+    os.remove(name_mp3)
 
 @log
 @auth_required
 def Balc(bot, update):
     r = requests.get(jsonUrl)
     # Температура
-    update.message.reply_text(emj_thermometer + " Температура на балконе " + getVal(r, 'balc', 'temp') + " градусов")
+    t_text = " Температура на балконе " + getVal(r, 'balc', 'temp') + " градусов"
+    update.message.reply_text(emj_thermometer + t_text)
     # Влажность
-    update.message.reply_text(emj_droplet + " Влажность " + getVal(r, 'balc', 'dump') + " %")
+    d_text = " Влажность " + getVal(r, 'balc', 'dump') + " %"
+    name_mp3 = getSpeech(t_text + d_text)
+    update.message.reply_text(emj_droplet + d_text)
+    bot.sendAudio(chat_id = update.message.chat_id, audio = open(name_mp3, 'rb'))
+    os.remove(name_mp3)
 
 def narodmon_send(bot, job):
     DEVICE_MAC = config['DEVICE_MAC']
@@ -278,13 +297,13 @@ def check_temperature(bot, job):
     temp = float(tempString)
 
     if temp < 15.0:
-        w_text = ' *Температура ниже {} градусов: {}!*'.format(15.0, temp)
+        w_text = 'Температура ниже {} градусов: {}!'.format(15.0, temp)
         name_mp3 = getSpeech(w_text)
         for user_chat in config['telegtam']['authenticated_users']:
             bot.sendMessage(
                 chat_id = user_chat,
                 parse_mode = ParseMode.MARKDOWN,
-                text = emj_warning + w_text
+                text = emj_warning + " *" + w_text + "*"
             )
             bot.sendAudio(chat_id = user_chat, audio = open(name_mp3, 'rb'))
         os.remove(name_mp3)
