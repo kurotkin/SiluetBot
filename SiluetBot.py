@@ -111,11 +111,11 @@ def Out(bot, update):
     t_text = " Температура на улице " + getVal(r, 'out', 'temp') + " градусов"
     update.message.reply_text(emj_thermometer + t_text)
     # Влажность
-    d_temp = " Влажность " + getVal(r, 'out', 'dump') + " %"
+    d_text = " Влажность " + getVal(r, 'out', 'dump') + " %"
     update.message.reply_text(emj_droplet + d_temp)
     # Давление
     p_text = " Давление " + getVal(r, 'out', 'press') + " мм.рт.ст."
-    update.message.reply_text(emj_press + p_text)
+    update.message.reply_text(emj_press + d_text)
     # Яркость
     l_text = " Солнце светит на  " + getVal(r, 'out', 'light') + " лк"
     update.message.reply_text(l_text)
