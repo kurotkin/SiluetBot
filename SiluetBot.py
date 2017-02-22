@@ -13,6 +13,7 @@ import urllib.request
 import io
 import emoji
 import socket
+from datetime import datetime
 
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
@@ -43,6 +44,24 @@ emj_exclamation_mark = emoji.emojize(":exclamation_mark:", use_aliases = True)
 emj_press = emoji.emojize(":crystal_ball:", use_aliases = True)
 emj_co2 = emoji.emojize(":fog:", use_aliases = True)
 emj_settings = emoji.emojize(":gear:", use_aliases = True)
+
+def addStr(Str):
+    return '%20'.join(Str.split())
+
+def getSpeech(Str):
+    name_mp3 = 'm' + datetime.now().strftime('%Y%m%d%H%M%S%f') + ".mp3"
+    url_mp3 = "https://tts.voicetech.yandex.net/generate"
+    url_mp3 = url_mp3 + "?text=" + addStr(Str)
+    url_mp3 = url_mp3 + "&format=mp3"
+    url_mp3 = url_mp3 + "&lang=ru-RU"
+    url_mp3 = url_mp3 + "&speaker=oksana"
+    url_mp3 = url_mp3 + "&emotion=good"
+    url_mp3 = url_mp3 + "&key=" + config['YANDEX_KEY']
+    mp3 = requests.get(url_mp3)
+    out = open(name_mp3, "wb")
+    out.write(mp3.content)
+    out.close()
+    return name_mp3
 
 # Define a few command handlers. These usually take the two arguments bot and
 # update. Error handlers also receive the raised TelegramError object in error.
@@ -259,12 +278,18 @@ def check_temperature(bot, job):
     temp = float(tempString)
 
     if temp < 15.0:
+        w_text = ' *Температура ниже {} градусов: {}!*'.format(15.0, temp)
+        name_mp3 = getSpeech(w_text)
         for user_chat in config['telegtam']['authenticated_users']:
             bot.sendMessage(
                 chat_id = user_chat,
                 parse_mode = ParseMode.MARKDOWN,
-                text = emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, temp)
+                text = emj_warning + w_text
             )
+            bot.sendAudio(chat_id = user_chat, audio = open(name_mp3, 'rb'))
+        os.remove(name_mp3)
+
+
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
