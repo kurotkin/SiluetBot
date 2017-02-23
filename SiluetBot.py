@@ -119,12 +119,14 @@ def Out(bot, update):
     # Яркость
     l_text = " Солнце светит на  " + getVal(r, 'out', 'light') + " лк"
     update.message.reply_text(l_text)
-    # Голос
-    name_mp3 = getSpeech(t_text + d_text + p_text + l_text)
     # Картинка с улицы
     name_img = getImage(config['Cam1'])
     bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
     os.remove(name_img)
+    # Audio
+    text_mp3 = t_text + d_text + p_text + l_text
+    name_mp3 = getSpeech(text_mp3)
+    logger.info(text_mp3)
     bot.sendAudio(chat_id = update.message.chat_id, audio = open(name_mp3, 'rb'))
     os.remove(name_mp3)
 
@@ -244,8 +246,11 @@ def In(bot, update):
     update.message.reply_text(emj_droplet + d_text)
     # CO2
     co2_text = " Содержание углекислого газа " + getVal(r, 'in', 'CO2') + " ppm"
-    name_mp3 = getSpeech(t_text + d_text + co2_text)
     update.message.reply_text(emj_co2 + co2_text)
+    # Audio
+    text_mp3 = t_text + d_text + co2_text
+    name_mp3 = getSpeech(text_mp3)
+    logger.info(text_mp3)
     bot.sendAudio(chat_id = update.message.chat_id, audio = open(name_mp3, 'rb'))
     os.remove(name_mp3)
 
@@ -258,8 +263,11 @@ def Balc(bot, update):
     update.message.reply_text(emj_thermometer + t_text)
     # Влажность
     d_text = " Влажность " + getVal(r, 'balc', 'dump') + " %"
-    name_mp3 = getSpeech(t_text + d_text)
     update.message.reply_text(emj_droplet + d_text)
+    # Audio
+    text_mp3 = t_text + d_text
+    name_mp3 = getSpeech(text_mp3)
+    logger.info(text_mp3)
     bot.sendAudio(chat_id = update.message.chat_id, audio = open(name_mp3, 'rb'))
     os.remove(name_mp3)
 
