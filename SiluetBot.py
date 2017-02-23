@@ -46,7 +46,8 @@ emj_co2 = emoji.emojize(":fog:", use_aliases = True)
 emj_settings = emoji.emojize(":gear:", use_aliases = True)
 
 def addStr(Str):
-    return '%20'.join(Str.split())
+    out = '%25'.join(Str.split("%"))
+    return '%20'.join(out.split(" "))
 
 def getSpeech(Str):
     name_mp3 = 'm' + datetime.now().strftime('%Y%m%d%H%M%S%f') + ".mp3"
