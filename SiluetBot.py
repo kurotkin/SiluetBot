@@ -354,10 +354,10 @@ def sql_send(bot, job):
                                     temp_in, dump_in, co2_in, temp_balc, dump_balc, t1))
         db.commit()
 
-    except _mysql.Error, e:
+    except _mysql.Error:
         if db:
             db.rollback()
-        logger.info("Error mysql {}:{}".format(e.args[0],e.args[1]))
+        logger.info("Error mysql {}".format(_mysql.Error))
 
     finally:    
         if db:    
