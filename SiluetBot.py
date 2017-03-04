@@ -339,7 +339,7 @@ def sql_send(bot, job):
     co2_in = getVal(r, 'in', 'CO2')
     t1 = getVal(r, 'balc', 't1')
     user = config['mysql']['user']
-    passwd = config['mysql']['pass']
+    passwd = config['mysql']['password']
     host = config['mysql']['host']
     db_name = config['mysql']['db']
     try:
