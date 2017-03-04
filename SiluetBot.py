@@ -14,11 +14,13 @@ import io
 import emoji
 import socket
 from datetime import datetime
+import _mysql
+import time    
+time.strftime('%Y-%m-%d %H:%M:%S')
 
 # Получаем конфигруационные данные из файла
 config = yaml.load(open('conf.yaml'))
-ur = yaml.load(open('conf_s7-1200.yaml'))
-jsonUrl = ur['S7_1200']['jsonUrl']
+jsonUrl = config['S7_1200']['jsonUrl']
 
 # Базовые настройка логирования
 logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -44,6 +46,7 @@ emj_exclamation_mark = emoji.emojize(":exclamation_mark:", use_aliases = True)
 emj_press = emoji.emojize(":crystal_ball:", use_aliases = True)
 emj_co2 = emoji.emojize(":fog:", use_aliases = True)
 emj_settings = emoji.emojize(":gear:", use_aliases = True)
+
 
 def addStr(Str):
     out = '%25'.join(Str.split("%"))
@@ -290,7 +293,7 @@ def narodmon_send(bot, job):
         sock.send(sendMess.encode("utf-8"))
         data = sock.recv(1024)
         sock.close()
-        logger.info(data)
+        logger.info("narodmon.ru: {}".format(data))
     except socket.error as e:
         logger.info('ERROR! Exception {}'.format(e))
 
@@ -317,7 +320,48 @@ def check_temperature(bot, job):
             bot.sendAudio(chat_id = user_chat, audio = open(name_mp3, 'rb'))
         os.remove(name_mp3)
 
+def get_str_time():
+    now = time.localtime()
+    f = "%Y-%m-%d %H:%M:%S"
+    return time.strftime(f, now)
 
+def sql_send(bot, job):
+    now = get_str_time()
+    r = requests.get(jsonUrl)
+    temp_out  = getVal(r, 'out', 'temp')
+    temp_in   = getVal(r, 'in', 'temp')
+    temp_balc = getVal(r, 'balc', 'temp')
+    dump_out  = getVal(r, 'out', 'dump')
+    dump_in   = getVal(r, 'in', 'dump')
+    dump_balc = getVal(r, 'balc', 'dump')
+    press_out = getVal(r, 'out', 'press')
+    light_out = getVal(r, 'out', 'light')
+    co2_in = getVal(r, 'in', 'CO2')
+    t1 = getVal(r, 'balc', 't1')
+    user = config['mysql']['user']
+    passwd = config['mysql']['pass']
+    host = config['mysql']['host']
+    db_name = config['mysql']['db']
+    try:
+        db = _mysql.connect(host = host, user = user,
+                            passwd = passwd, db = db_name)
+        cur = db.cursor()
+        cur.execute("INSERT INTO vals(time_id, temp_out, dump_out, press_out, " + \
+                                "light_out, temp_in, dump_in, co2_in, temp_balc, " + \
+                                "dump_balc, t1)"  + \
+                                " VALUES({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, " + \
+                                "{})".format(now, temp_out, dump_out, press_out, light_out,
+                                    temp_in, dump_in, co2_in, temp_balc, dump_balc, t1))
+        db.commit()
+
+    except _mysql.Error, e:
+        if db:
+            db.rollback()
+        logger.info("Error mysql {}:{}".format(e.args[0],e.args[1]))
+
+    finally:    
+        if db:    
+            db.close()
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
@@ -356,7 +400,7 @@ def main():
     job_queue.put(Job(narodmon_send, 60*6), next_t = 60*6)
 
     # Every 1 minutes
-    #job_queue.put(Job(narodmon_send, 60 * 1), next_t = 0)
+    job_queue.put(Job(sql_send, 60 * 1), next_t = 5)
 
 
 
