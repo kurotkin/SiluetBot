@@ -14,22 +14,19 @@ import io
 import emoji
 import socket
 from datetime import datetime
-import _mysql
-import time    
-time.strftime('%Y-%m-%d %H:%M:%S')
 
-# Получаем конфигруационные данные из файла
+# Get the configuration data from the file
 config = yaml.load(open('conf.yaml'))
 jsonUrl = config['S7_1200']['jsonUrl']
 
-# Базовые настройка логирования
+# Basic Setup logging
 logging.basicConfig(format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level = logging.INFO,
                     filename = 'log.log')
 
 logger = logging.getLogger(__name__)
 
-# emoji
+# Emoji
 emj_cake = emoji.emojize(":cake:", use_aliases = True)
 emj_cityscape = emoji.emojize(":cityscape:", use_aliases = True)
 emj_couch_and_lamp = emoji.emojize(":couch_and_lamp:", use_aliases = True)
@@ -47,11 +44,21 @@ emj_press = emoji.emojize(":crystal_ball:", use_aliases = True)
 emj_co2 = emoji.emojize(":fog:", use_aliases = True)
 emj_settings = emoji.emojize(":gear:", use_aliases = True)
 
+def main_keyboard():
+    keyboard = [['/Балкон ' + emj_balc, '/Тест ' + emj_test], 
+                ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp]]
+    return keyboard
 
+def custom_keyboard() 
+    keyboard = [['/Основное_меню ' + emj_back, '/Тест_температуры ' + emj_bellhop_bell]]
+    return keyboard
+
+# Adding %20 instead of " " for GET query
 def addStr(Str):
     out = '%25'.join(Str.split("%"))
     return '%20'.join(out.split(" "))
 
+# Yandex voice speech
 def getSpeech(Str):
     name_mp3 = 'm' + datetime.now().strftime('%Y%m%d%H%M%S%f') + ".mp3"
     url_mp3 = "https://tts.voicetech.yandex.net/generate"
@@ -67,8 +74,7 @@ def getSpeech(Str):
     out.close()
     return name_mp3
 
-# Define a few command handlers. These usually take the two arguments bot and
-# update. Error handlers also receive the raised TelegramError object in error.
+# Start Bot
 def start(bot, update):
     update.message.reply_text("Привет, дорогой друг!\n Для получения информации набери /info")
 
@@ -76,10 +82,7 @@ def auth(bot, update):
     if config['telegtam']['password'] in update.message.text:
         if update.message.chat_id not in config['telegtam']['authenticated_users']:
             config['telegtam']['authenticated_users'].append(update.message.chat_id)
-        custom_keyboard = [
-            ['/Балкон ' + emj_balc, '/Тест ' + emj_test],
-            ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp, '/Настройки ' + emj_settings]        ]
-        reply_markup = ReplyKeyboardMarkup(custom_keyboard)
+        reply_markup = ReplyKeyboardMarkup(main_keyboard())
         bot.sendMessage(
             chat_id = update.message.chat_id,
             text = "Вы авторизованы.",
@@ -111,19 +114,19 @@ def getVal (req, location, sign):
 
 def Out(bot, update):
     r = requests.get(jsonUrl)
-    # Температура
+    # Temperature
     t_text = " Температура на улице " + getVal(r, 'out', 'temp') + " градусов"
     update.message.reply_text(emj_thermometer + t_text)
-    # Влажность
+    # Humidity
     d_text = " Влажность " + getVal(r, 'out', 'dump') + " %"
     update.message.reply_text(emj_droplet + d_text)
-    # Давление
+    # Pressure
     p_text = " Давление " + getVal(r, 'out', 'press') + " мм.рт.ст."
     update.message.reply_text(emj_press + p_text)
-    # Яркость
+    # Brightness
     l_text = " Солнце светит на  " + getVal(r, 'out', 'light') + " лк"
     update.message.reply_text(l_text)
-    # Картинка с улицы
+    # Street picture
     name_img = getImage(config['Cam1'])
     bot.sendPhoto(chat_id = update.message.chat_id, photo = open(name_img, 'rb'))
     os.remove(name_img)
@@ -147,8 +150,8 @@ def echo(bot, update):
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
 
-### Декораторы ###
-# Аутентификация
+### Decorators ###
+# Authentication
 def auth_required(func):
     @functools.wraps(func)
     def wrapped(bot, update):
@@ -161,7 +164,7 @@ def auth_required(func):
             return func(bot, update)
     return wrapped
 
-# Логирование
+# Logging
 def log(func):
     @functools.wraps(func)
     def wrapped(bot, update):
@@ -173,40 +176,11 @@ def log(func):
     return wrapped
 
 
-### Команды ###
-@log
-@auth_required
-def outdoor_light_on(bot, update):
-    logger.info('outdoor_light_on')
-    bot.sendMessage(chat_id = update.message.chat_id, text = 'outdoor_light_on')
-
-@log
-@auth_required
-def outdoor_light_off(bot, update):
-    logger.info('outdoor_light_off')
-    bot.sendMessage(chat_id = update.message.chat_id, text = 'outdoor_light_off')
-
-
-@log
-@auth_required
-def heaters_on(bot, update):
-    logger.info('heaters_on')
-    bot.sendMessage(chat_id = update.message.chat_id, text = 'heaters_on')
-
-
-@log
-@auth_required
-def heaters_off(bot, update):
-    logger.info('outdoor_light_off')
-    bot.sendMessage(chat_id = update.message.chat_id, text = 'outdoor_light_off')
-
+### Commands ###
 @log
 @auth_required
 def openTestMenu(bot, update):
-    custom_keyboard = [
-        ['/Основное_меню ' + emj_back, '/Тест_температуры ' + emj_bellhop_bell]
-    ]
-    reply_markup = ReplyKeyboardMarkup(custom_keyboard)
+    reply_markup = ReplyKeyboardMarkup(custom_keyboard())
     bot.sendMessage(
         chat_id = update.message.chat_id,
         text = "Меню тестирования",
@@ -216,11 +190,7 @@ def openTestMenu(bot, update):
 @log
 @auth_required
 def openMainMenu(bot, update):
-    custom_keyboard = [
-        ['/Балкон ' + emj_balc, '/Тест ' + emj_test],
-        ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp]
-    ]
-    reply_markup = ReplyKeyboardMarkup(custom_keyboard)
+    reply_markup = ReplyKeyboardMarkup(main_keyboard())
     bot.sendMessage(
         chat_id = update.message.chat_id,
         text = "Основное меню",
@@ -230,22 +200,17 @@ def openMainMenu(bot, update):
 @log
 @auth_required
 def testTemp(bot, update):
-    for user_chat in config['telegtam']['authenticated_users']:
-        bot.sendMessage(
-            chat_id = user_chat,
-            parse_mode = ParseMode.MARKDOWN,
-            text = emj_exclamation_mark + " *Внимание! Процесс тестирования!*\n" + \
-                    emj_warning + ' *Температура ниже {} градусов: {}!* '.format(15.0, 15.0)
-        )
+    r = requests.get(jsonUrl)
+    update.message.reply_text(r.text)
 
 @log
 @auth_required
 def In(bot, update):
     r = requests.get(jsonUrl)
-    # Температура
+    # Temperature
     t_text = " Температура в комнате " + getVal(r, 'in', 'temp') + " градусов"
     update.message.reply_text(emj_thermometer + t_text)
-    # Влажность
+    # Humidity
     d_text = " Влажность " + getVal(r, 'in', 'dump') + " %"
     update.message.reply_text(emj_droplet + d_text)
     # CO2
@@ -262,10 +227,10 @@ def In(bot, update):
 @auth_required
 def Balc(bot, update):
     r = requests.get(jsonUrl)
-    # Температура
+    # Temperature
     t_text = " Температура на балконе " + getVal(r, 'balc', 'temp') + " градусов"
     update.message.reply_text(emj_thermometer + t_text)
-    # Влажность
+    # Humidity
     d_text = " Влажность " + getVal(r, 'balc', 'dump') + " %"
     update.message.reply_text(emj_droplet + d_text)
     # Audio
@@ -298,13 +263,12 @@ def narodmon_send(bot, job):
         logger.info('ERROR! Exception {}'.format(e))
 
 def check_temperature(bot, job):
-    """Переодическая проверка температуры с датчиков
+    """Periodic temperature test from sensors
 
-    Eсли температура ниже, чем установленный минимум -
-    посылаем уведомление зарегистрированным пользователям
+        If the temperature is lower than the set minimum -
+        Send notification to registered users
     """
     r = requests.get(jsonUrl)
-    # Температура
     tempString = getVal(r, 'balc', 'temp')
     temp = float(tempString)
 
@@ -319,49 +283,6 @@ def check_temperature(bot, job):
             )
             bot.sendAudio(chat_id = user_chat, audio = open(name_mp3, 'rb'))
         os.remove(name_mp3)
-
-def get_str_time():
-    now = time.localtime()
-    f = "%Y-%m-%d %H:%M:%S"
-    return time.strftime(f, now)
-
-def sql_send(bot, job):
-    now = get_str_time()
-    r = requests.get(jsonUrl)
-    temp_out  = getVal(r, 'out', 'temp')
-    temp_in   = getVal(r, 'in', 'temp')
-    temp_balc = getVal(r, 'balc', 'temp')
-    dump_out  = getVal(r, 'out', 'dump')
-    dump_in   = getVal(r, 'in', 'dump')
-    dump_balc = getVal(r, 'balc', 'dump')
-    press_out = getVal(r, 'out', 'press')
-    light_out = getVal(r, 'out', 'light')
-    co2_in = getVal(r, 'in', 'CO2')
-    t1 = getVal(r, 'balc', 't1')
-    user = config['mysql']['user']
-    passwd = config['mysql']['password']
-    host = config['mysql']['host']
-    db_name = config['mysql']['db']
-    try:
-        db = _mysql.connect(host = host, user = user,
-                            passwd = passwd, db = db_name)
-        cur = db.cursor()
-        cur.execute("INSERT INTO vals(time_id, temp_out, dump_out, press_out, " + \
-                                "light_out, temp_in, dump_in, co2_in, temp_balc, " + \
-                                "dump_balc, t1)"  + \
-                                " VALUES({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, " + \
-                                "{})".format(now, temp_out, dump_out, press_out, light_out,
-                                    temp_in, dump_in, co2_in, temp_balc, dump_balc, t1))
-        db.commit()
-
-    except _mysql.Error:
-        if db:
-            db.rollback()
-        logger.info("Error mysql {}".format(_mysql.Error))
-
-    finally:    
-        if db:    
-            db.close()
 
 def main():
     updater = Updater(config['telegtam']['TOKEN'])
@@ -385,11 +306,6 @@ def main():
     dp.add_handler(CommandHandler('Основное_меню', openMainMenu))
     dp.add_handler(CommandHandler('Тест_температуры', testTemp))
 
-    dp.add_handler(CommandHandler('Включить_обогреватели', heaters_on))
-    dp.add_handler(CommandHandler('Выключить_обогреватели', heaters_off))
-    dp.add_handler(CommandHandler('Включить_прожектор', outdoor_light_on))
-    dp.add_handler(CommandHandler('Выключить_прожектор', outdoor_light_off))
-
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
 
@@ -399,15 +315,9 @@ def main():
     # Every 5 minutes
     job_queue.put(Job(narodmon_send, 60*6), next_t = 60*6)
 
-    # Every 1 minutes
-    job_queue.put(Job(sql_send, 60 * 1), next_t = 5)
-
-
-
     dp.add_error_handler(error)
     updater.start_polling()
     updater.idle()
-
 
 if __name__ == '__main__':
     main()
