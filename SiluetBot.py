@@ -49,8 +49,8 @@ def main_keyboard():
                 ['/Улица ' + emj_cityscape, '/Комната ' + emj_couch_and_lamp]]
     return keyboard
 
-def custom_keyboard() 
-    keyboard = [['/Основное_меню ' + emj_back, '/Тест_температуры ' + emj_bellhop_bell]]
+def custom_keyboard():
+    keyboard = [['/Основное_меню ' + emj_back, '/Тестовая информация ' + emj_bellhop_bell]]
     return keyboard
 
 # Adding %20 instead of " " for GET query
