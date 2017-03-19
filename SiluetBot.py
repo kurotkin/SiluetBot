@@ -50,7 +50,7 @@ def main_keyboard():
     return keyboard
 
 def custom_keyboard():
-    keyboard = [['/Основное_меню ' + emj_back, '/Тестовая информация ' + emj_bellhop_bell]]
+    keyboard = [['/Основное_меню ' + emj_back, '/Тестовая_информация ' + emj_bellhop_bell]]
     return keyboard
 
 # Adding %20 instead of " " for GET query
@@ -304,7 +304,7 @@ def main():
 
     dp.add_handler(CommandHandler('Тест', openTestMenu))
     dp.add_handler(CommandHandler('Основное_меню', openMainMenu))
-    dp.add_handler(CommandHandler('Тест_температуры', testTemp))
+    dp.add_handler(CommandHandler('Тестовая_информация', testTemp))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, echo))
