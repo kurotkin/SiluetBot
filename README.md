@@ -36,3 +36,9 @@ Add autostart:
 ## Requirements
 - Python 3
 
+## Autostart
+`sudo nano /etc/rc.local`
+And added:
+`cd /home/pi/SiluetBot/`
+`/usr/bin/python3.4 /home/pi/SiluetBot/SiluetBot.py 1 > /dev/null 2 > /dev/null &`
+
